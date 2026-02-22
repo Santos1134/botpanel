@@ -81,7 +81,10 @@ input:focus,textarea:focus,select:focus{border-color:#f97316;box-shadow:0 0 0 3p
 .badge-approved{background:#dcfce7;color:#16a34a}
 .badge-rejected{background:#fef2f2;color:#dc2626}
 .empty{text-align:center;padding:24px;color:#9ca3af;font-size:13px}
-@media(max-width:600px){.pricing-grid{grid-template-columns:1fr}.balance-card{flex-direction:column;gap:12px}}
+@media(max-width:640px){.pricing-grid{grid-template-columns:1fr}.balance-card{flex-direction:column;gap:12px}.nav-links{display:none}.nav-user span{display:none}.logout-btn{padding:6px 10px;font-size:12px}main{padding:16px 12px;padding-bottom:80px}.bottom-nav{display:flex}}
+.bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e5e7eb;padding:6px 0 10px;z-index:100;justify-content:space-around}
+.bottom-nav a{display:flex;flex-direction:column;align-items:center;gap:2px;text-decoration:none;color:#6b7280;font-size:10px;font-weight:600;padding:4px 12px;border-radius:8px}
+.bottom-nav a.active{color:#f97316}
 </style>
 </head>
 <body>
@@ -354,5 +357,11 @@ input:focus,textarea:focus,select:focus{border-color:#f97316;box-shadow:0 0 0 3p
   load();
   loadPaymentRequests();
 </script>
+<div class="bottom-nav">
+  <a href="/dashboard"><span style="font-size:20px">🏠</span><span>Home</span></a>
+  <a href="/bots"><span style="font-size:20px">🤖</span><span>Bots</span></a>
+  <a href="/coins" class="active"><span style="font-size:20px">🪙</span><span>Coins</span></a>
+  <a href="/deploy"><span style="font-size:20px">➕</span><span>Deploy</span></a>
+</div>
 </body>
 </html>

@@ -107,6 +107,16 @@ app.post('/api/deploy', requireAuth, async (req, res) => {
   }
 });
 
+app.delete('/api/deploy/:botId/record', requireAuth, async (req, res) => {
+  try {
+    const { data } = await vps('delete', `/deploy/${req.params.botId}/record`);
+    res.json(data);
+  } catch (e) {
+    const msg = e.response?.data?.error || 'Failed to remove bot.';
+    res.status(e.response?.status || 500).json({ error: msg });
+  }
+});
+
 app.delete('/api/deploy/:botId', requireAuth, async (req, res) => {
   try {
     const { data } = await vps('delete', `/deploy/${req.params.botId}`);
