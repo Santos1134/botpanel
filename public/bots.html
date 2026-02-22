@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Bots - Mark Sumo Bot</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f3f4f6;color:#111}
+nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px;height:60px;background:#fff;border-bottom:1px solid #e5e7eb;position:sticky;top:0;z-index:10}
+.nav-logo span{background:linear-gradient(135deg,#f97316,#facc15);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:800;font-size:18px}
+.nav-links a{padding:7px 14px;border-radius:8px;text-decoration:none;color:#6b7280;font-size:14px;font-weight:500;transition:.2s}
+.nav-links a:hover,.nav-links a.active{background:#fff7ed;color:#f97316}
+.nav-user{display:flex;align-items:center;gap:10px}
+.nav-user span{font-size:14px;font-weight:600}
+.logout-btn{background:none;border:1.5px solid #e5e7eb;color:#6b7280;padding:6px 14px;border-radius:8px;font-size:13px;cursor:pointer}
+.logout-btn:hover{border-color:#f97316;color:#f97316}
+main{max-width:960px;margin:0 auto;padding:32px 24px}
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.page-title{font-size:22px;font-weight:800}
+.page-sub{font-size:14px;color:#6b7280}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;border:none;text-decoration:none;transition:.2s}
+.btn-primary{background:linear-gradient(135deg,#f97316,#ea580c);color:#fff}
+.btn-primary:hover{opacity:.9}
+.btn-danger{background:#fef2f2;color:#dc2626;border:1px solid #fecaca}
+.btn-danger:hover{background:#fee2e2}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}
+.stat{background:#fff;border-radius:12px;padding:16px 20px;border:1px solid #e5e7eb;display:flex;align-items:center;justify-content:space-between}
+.stat .val{font-size:22px;font-weight:800}
+.stat .lbl{font-size:12px;color:#6b7280;margin-top:2px}
+.stat-icon{font-size:20px}
+.cost-banner{background:#fff;border-radius:12px;padding:16px 20px;border:1px solid #e5e7eb;display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
+.cost-banner .left .title{font-size:14px;font-weight:700}
+.cost-banner .left .sub{font-size:12px;color:#6b7280}
+.cost-banner .right{font-size:16px;font-weight:700;color:#f97316;text-align:right}
+.cost-banner .right small{display:block;font-size:12px;color:#6b7280;font-weight:400}
+.bot-card{background:#fff;border-radius:12px;border:1px solid #e5e7eb;padding:20px 24px;margin-bottom:16px}
+.bot-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.bot-name{display:flex;align-items:center;gap:10px}
+.bot-name .icon{font-size:22px}
+.bot-name h3{font-size:16px;font-weight:700}
+.bot-name p{font-size:13px;color:#6b7280}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600}
+.badge-active{background:#dcfce7;color:#16a34a}
+.badge-stopped{background:#f3f4f6;color:#6b7280}
+.badge-no-coins{background:#fef9c3;color:#b45309}
+.bot-meta{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;font-size:13px;color:#6b7280;border-top:1px solid #f0f0f0;padding-top:12px;margin-top:4px}
+.bot-meta .item strong{display:block;color:#111;font-size:13px;font-weight:600}
+.renew-row{display:flex;align-items:center;gap:6px;margin-top:8px;font-size:13px;color:#6b7280}
+.renew-row span{color:#16a34a;font-weight:600}
+.empty{text-align:center;padding:60px 24px;color:#9ca3af}
+.empty h3{font-size:18px;font-weight:600;margin-bottom:8px;color:#6b7280}
+.empty p{margin-bottom:20px}
+@media(max-width:600px){.stats{grid-template-columns:repeat(2,1fr)}.bot-meta{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-logo"><a href="/" style="text-decoration:none"><span>Mark Sumo Bot</span></a></div>
+  <div class="nav-links">
+    <a href="/dashboard">🏠 Home</a>
+    <a href="/bots" class="active">🤖 My Bots</a>
+    <a href="/coins">🪙 My Coins</a>
+    <a href="/deploy">➕ Deploy</a>
+  </div>
+  <div class="nav-user">
+    <span id="nav-name">...</span>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </div>
+</nav>
+
+<main>
+  <div class="page-header">
+    <div>
+      <div class="page-title">🤖 Manage Bots</div>
+      <div class="page-sub">Deploy and manage your WhatsApp bots</div>
+    </div>
+    <a href="/deploy" class="btn btn-primary">➕ Deploy New Bot</a>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div><div class="val" id="s-total">-</div><div class="lbl">Total Bots</div></div><div class="stat-icon">🤖</div></div>
+    <div class="stat"><div><div class="val" id="s-active" style="color:#16a34a">-</div><div class="lbl">Active Bots</div></div><div class="stat-icon">▶️</div></div>
+    <div class="stat"><div><div class="val" id="s-inactive" style="color:#d97706">-</div><div class="lbl">Inactive Bots</div></div><div class="stat-icon">⏸️</div></div>
+    <div class="stat"><div><div class="val" id="s-coins" style="color:#f97316">-</div><div class="lbl">My Coins</div></div><div class="stat-icon">🪙</div></div>
+  </div>
+
+  <div class="cost-banner">
+    <div class="left"><div class="title">📈 Maintenance Costs</div><div class="sub">Estimated renewal costs for active bots</div></div>
+    <div class="right"><span id="daily-cost">-</span><small id="monthly-cost">-</small></div>
+  </div>
+
+  <div id="bots-list"></div>
+</main>
+
+<script>
+  const token = localStorage.getItem('msb_token');
+  if (!token) window.location.href = '/login';
+
+  function logout() {
+    localStorage.removeItem('msb_token');
+    localStorage.removeItem('msb_user');
+    window.location.href = '/login';
+  }
+
+  function timeAgo(dt) {
+    const diff = (Date.now() - new Date(dt + 'Z').getTime()) / 1000;
+    if (diff < 60) return 'just now';
+    if (diff < 3600) return Math.floor(diff/60) + ' mins ago';
+    if (diff < 86400) return Math.floor(diff/3600) + ' hrs ago';
+    return Math.floor(diff/86400) + ' days ago';
+  }
+
+  function statusBadge(s) {
+    if (s === 'running') return '<span class="badge badge-active">active</span>';
+    if (s === 'stopped_no_coins') return '<span class="badge badge-no-coins">stopped (no coins)</span>';
+    return '<span class="badge badge-stopped">stopped</span>';
+  }
+
+  async function stopBot(botId) {
+    if (!confirm('Stop this bot?')) return;
+    await fetch('/api/deploy/' + botId, { method: 'DELETE', headers: { Authorization: 'Bearer ' + token } });
+    load();
+  }
+
+  async function load() {
+    const [meRes, botsRes] = await Promise.all([
+      fetch('/api/user/me', { headers: { Authorization: 'Bearer ' + token } }),
+      fetch('/api/user/deployments', { headers: { Authorization: 'Bearer ' + token } })
+    ]);
+    if (meRes.status === 401) { logout(); return; }
+    const me = await meRes.json();
+    const bots = await botsRes.json();
+
+    document.getElementById('nav-name').textContent = me.username;
+    document.getElementById('s-total').textContent   = me.totalBots;
+    document.getElementById('s-active').textContent  = me.activeBots;
+    document.getElementById('s-inactive').textContent = me.inactiveBots;
+    document.getElementById('s-coins').textContent   = me.coins;
+
+    const daily = me.activeBots;
+    document.getElementById('daily-cost').textContent   = `${daily} coin${daily !== 1 ? 's' : ''}/day`;
+    document.getElementById('monthly-cost').textContent = `${daily * 30} coins/month`;
+
+    const list = document.getElementById('bots-list');
+    if (!bots.length) {
+      list.innerHTML = `<div class="empty"><h3>No bots yet</h3><p>Deploy your first WhatsApp bot to get started.</p><a href="/deploy" class="btn btn-primary">Deploy New Bot</a></div>`;
+      return;
+    }
+
+    list.innerHTML = bots.map(b => `
+      <div class="bot-card">
+        <div class="bot-header">
+          <div class="bot-name">
+            <div class="icon">🤖</div>
+            <div>
+              <h3>${b.app_name || b.bot_id}</h3>
+              <p>WhatsApp Bot</p>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            ${statusBadge(b.status)}
+            ${b.status === 'running' ? `<button class="btn btn-danger" onclick="stopBot('${b.bot_id}')">■ Stop</button>` : ''}
+          </div>
+        </div>
+        <div class="bot-meta">
+          <div class="item"><strong>${b.session_preview || '—'}</strong>Session</div>
+          <div class="item"><strong>${new Date(b.deployed_at).toLocaleDateString()}</strong>Created</div>
+          <div class="item"><strong>1 coin · 1/day</strong>Pricing</div>
+        </div>
+        ${b.status === 'running' ? `<div class="renew-row">🔄 Renews <span>${timeAgo(b.deployed_at)}</span></div>` : ''}
+      </div>
+    `).join('');
+  }
+
+  load();
+</script>
+</body>
+</html>

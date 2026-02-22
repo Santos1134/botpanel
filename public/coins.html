@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Coins - Mark Sumo Bot</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f3f4f6;color:#111}
+nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px;height:60px;background:#fff;border-bottom:1px solid #e5e7eb;position:sticky;top:0;z-index:10}
+.nav-logo span{background:linear-gradient(135deg,#f97316,#facc15);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:800;font-size:18px}
+.nav-links a{padding:7px 14px;border-radius:8px;text-decoration:none;color:#6b7280;font-size:14px;font-weight:500;transition:.2s}
+.nav-links a:hover,.nav-links a.active{background:#fff7ed;color:#f97316}
+.nav-user{display:flex;align-items:center;gap:10px}
+.nav-user span{font-size:14px;font-weight:600}
+.logout-btn{background:none;border:1.5px solid #e5e7eb;color:#6b7280;padding:6px 14px;border-radius:8px;font-size:13px;cursor:pointer}
+.logout-btn:hover{border-color:#f97316;color:#f97316}
+main{max-width:780px;margin:0 auto;padding:32px 24px}
+.page-title{font-size:22px;font-weight:800;margin-bottom:4px}
+.page-sub{font-size:14px;color:#6b7280;margin-bottom:28px}
+.balance-card{background:linear-gradient(135deg,#f97316,#facc15);border-radius:16px;padding:28px 32px;color:#fff;display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
+.balance-card .label{font-size:13px;opacity:.85;margin-bottom:6px}
+.balance-card .amount{font-size:48px;font-weight:800;line-height:1}
+.balance-card .sub{font-size:12px;opacity:.75;margin-top:6px}
+.balance-icon{font-size:48px;opacity:.6}
+.card{background:#fff;border-radius:12px;padding:24px;border:1px solid #e5e7eb;margin-bottom:20px}
+.card-title{font-size:16px;font-weight:700;margin-bottom:4px}
+.card-sub{font-size:13px;color:#6b7280;margin-bottom:20px}
+/* Pricing */
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.price-card{border:2px solid #e5e7eb;border-radius:12px;padding:20px;text-align:center;cursor:pointer;transition:.2s;position:relative}
+.price-card:hover{border-color:#f97316;background:#fff7ed}
+.price-card.selected{border-color:#f97316;background:#fff7ed}
+.price-card.popular{border-color:#f97316}
+.popular-badge{position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#f97316,#ea580c);color:#fff;font-size:11px;font-weight:700;padding:2px 12px;border-radius:20px;white-space:nowrap}
+.price-usd{font-size:28px;font-weight:800;color:#111}
+.price-usd span{font-size:14px;font-weight:400;color:#6b7280}
+.price-coins{font-size:16px;font-weight:700;color:#f97316;margin:6px 0}
+.price-days{font-size:13px;color:#6b7280}
+.price-label{font-size:12px;font-weight:600;color:#9ca3af;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
+/* Payment details */
+.payment-box{background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:16px}
+.payment-method{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid #f0f0f0}
+.payment-method:last-child{border-bottom:none;padding-bottom:0}
+.method-icon{font-size:22px;width:36px;text-align:center;flex-shrink:0}
+.method-info .name{font-size:14px;font-weight:700}
+.method-info .number{font-size:15px;font-weight:800;color:#f97316;letter-spacing:.5px}
+.method-info .holder{font-size:12px;color:#6b7280;margin-top:2px}
+/* Form */
+.form-group{margin-bottom:16px}
+label{display:block;font-size:13px;font-weight:600;color:#374151;margin-bottom:6px}
+input,textarea,select{width:100%;padding:11px 14px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:14px;outline:none;transition:.2s;color:#111;background:#fff;font-family:inherit}
+input:focus,textarea:focus,select:focus{border-color:#f97316;box-shadow:0 0 0 3px rgba(249,115,22,.1)}
+.hint{font-size:12px;color:#9ca3af;margin-top:4px}
+.upload-box{border:2px dashed #e5e7eb;border-radius:8px;padding:24px;text-align:center;cursor:pointer;transition:.2s;position:relative}
+.upload-box:hover{border-color:#f97316;background:#fff7ed}
+.upload-box input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
+.upload-box .icon{font-size:28px;margin-bottom:8px}
+.upload-box p{font-size:13px;color:#6b7280}
+.upload-box .file-name{font-size:13px;font-weight:600;color:#f97316;margin-top:4px}
+.preview-img{max-width:100%;max-height:200px;border-radius:8px;margin-top:10px;display:none}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:11px 24px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;border:none;transition:.2s;width:100%}
+.btn-primary{background:linear-gradient(135deg,#f97316,#ea580c);color:#fff}
+.btn-primary:hover{opacity:.9}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed}
+.error{background:#fef2f2;border:1px solid #fecaca;color:#dc2626;border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:14px;display:none}
+.success{background:#f0fdf4;border:1px solid #bbf7d0;color:#16a34a;border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:14px;display:none}
+/* Transactions */
+.tx-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid #f0f0f0}
+.tx-row:last-child{border-bottom:none}
+.tx-desc{font-size:14px;font-weight:500}
+.tx-date{font-size:12px;color:#9ca3af;margin-top:2px}
+.tx-amount{font-size:15px;font-weight:700}
+.tx-positive{color:#16a34a}
+.tx-negative{color:#dc2626}
+/* Payment requests status */
+.pr-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid #f0f0f0}
+.pr-row:last-child{border-bottom:none}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600}
+.badge-pending{background:#fef9c3;color:#b45309}
+.badge-approved{background:#dcfce7;color:#16a34a}
+.badge-rejected{background:#fef2f2;color:#dc2626}
+.empty{text-align:center;padding:24px;color:#9ca3af;font-size:13px}
+@media(max-width:600px){.pricing-grid{grid-template-columns:1fr}.balance-card{flex-direction:column;gap:12px}}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-logo"><a href="/" style="text-decoration:none"><span>Mark Sumo Bot</span></a></div>
+  <div class="nav-links">
+    <a href="/dashboard">🏠 Home</a>
+    <a href="/bots">🤖 My Bots</a>
+    <a href="/coins" class="active">🪙 My Coins</a>
+    <a href="/deploy">➕ Deploy</a>
+  </div>
+  <div class="nav-user">
+    <span id="nav-name">...</span>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </div>
+</nav>
+
+<main>
+  <div class="page-title">🪙 My Coins</div>
+  <div class="page-sub">Buy coins to deploy and keep your bots running</div>
+
+  <!-- Balance -->
+  <div class="balance-card">
+    <div>
+      <div class="label">Available Balance</div>
+      <div class="amount" id="balance">...</div>
+      <div class="sub">coins available · 1 coin = 1 bot running for 1 day</div>
+    </div>
+    <div class="balance-icon">🪙</div>
+  </div>
+
+  <!-- Pricing Packages -->
+  <div class="card">
+    <div class="card-title">💳 Buy Coins</div>
+    <div class="card-sub">Choose a package, make payment, then submit your screenshot below</div>
+
+    <div class="pricing-grid" id="pricing-grid">
+      <div class="price-card" onclick="selectPackage(this,'Starter',5,30)">
+        <div class="price-label">Starter</div>
+        <div class="price-usd">$5<span>/once</span></div>
+        <div class="price-coins">🪙 30 coins</div>
+        <div class="price-days">≈ 1 month for 1 bot</div>
+      </div>
+      <div class="price-card popular" onclick="selectPackage(this,'Standard',10,70)">
+        <div class="popular-badge">⭐ Best Value</div>
+        <div class="price-label">Standard</div>
+        <div class="price-usd">$10<span>/once</span></div>
+        <div class="price-coins">🪙 70 coins</div>
+        <div class="price-days">≈ 2 months for 1 bot</div>
+      </div>
+      <div class="price-card" onclick="selectPackage(this,'Premium',20,150)">
+        <div class="price-label">Premium</div>
+        <div class="price-usd">$20<span>/once</span></div>
+        <div class="price-coins">🪙 150 coins</div>
+        <div class="price-days">≈ 5 months for 1 bot</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payment Instructions -->
+  <div class="card">
+    <div class="card-title">📲 Payment Details</div>
+    <div class="card-sub">Send payment using any of the options below, then upload your screenshot</div>
+    <div class="payment-box">
+      <div class="payment-method">
+        <div class="method-icon">🟡</div>
+        <div class="method-info">
+          <div class="name">MTN Mobile Money</div>
+          <div class="number">0555 850 736</div>
+          <div class="holder">Account Name: Mark Sumo</div>
+        </div>
+      </div>
+      <div class="payment-method">
+        <div class="method-icon">🟠</div>
+        <div class="method-info">
+          <div class="name">Orange Money</div>
+          <div class="number">0776 428 126</div>
+          <div class="holder">Account Name: Mark Sumo</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Submit Proof -->
+  <div class="card">
+    <div class="card-title">📤 Submit Payment Proof</div>
+    <div class="card-sub">Upload your payment screenshot and we'll credit your account within minutes</div>
+
+    <div class="error" id="error"></div>
+    <div class="success" id="success"></div>
+
+    <form id="pay-form">
+      <div class="form-group">
+        <label>Selected Package</label>
+        <select id="sel-package" required>
+          <option value="">— Select a package above —</option>
+          <option value="Starter|5|30">Starter — $5 = 30 coins</option>
+          <option value="Standard|10|70">Standard — $10 = 70 coins</option>
+          <option value="Premium|20|150">Premium — $20 = 150 coins</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Payment Screenshot <span style="color:#dc2626">*</span></label>
+        <div class="upload-box" id="upload-box">
+          <input type="file" id="screenshot" accept="image/*" onchange="previewFile(this)">
+          <div class="icon">📷</div>
+          <p>Click to upload your payment screenshot</p>
+          <div class="file-name" id="file-name"></div>
+          <img id="preview-img" class="preview-img">
+        </div>
+        <div class="hint">JPG, PNG — max 2MB</div>
+      </div>
+      <div class="form-group">
+        <label>Transaction Reference / Note <span style="font-size:12px;color:#9ca3af;font-weight:400">(optional)</span></label>
+        <input type="text" id="note" placeholder="e.g. transaction ID or any note for admin">
+      </div>
+      <button type="submit" class="btn btn-primary" id="pay-btn">📤 Submit Payment Proof</button>
+    </form>
+  </div>
+
+  <!-- My Payment Requests -->
+  <div class="card">
+    <div class="card-title">📋 My Payment Requests</div>
+    <div class="card-sub">Track the status of your submitted payments</div>
+    <div id="pr-list"><div class="empty">Loading...</div></div>
+  </div>
+
+  <!-- Transaction History -->
+  <div class="card">
+    <div class="card-title">💰 Transaction History</div>
+    <div class="card-sub">Recent coin activity on your account</div>
+    <div id="tx-list"><div class="empty">Loading...</div></div>
+  </div>
+</main>
+
+<script>
+  const token = localStorage.getItem('msb_token');
+  if (!token) window.location.href = '/login';
+
+  function logout() {
+    localStorage.removeItem('msb_token');
+    localStorage.removeItem('msb_user');
+    window.location.href = '/login';
+  }
+
+  let selectedPackage = null;
+
+  function selectPackage(el, name, usd, coins) {
+    document.querySelectorAll('.price-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedPackage = { name, usd, coins };
+    document.getElementById('sel-package').value = `${name}|${usd}|${coins}`;
+  }
+
+  function previewFile(input) {
+    const file = input.files[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      alert('File too large. Max 2MB.');
+      input.value = '';
+      return;
+    }
+    document.getElementById('file-name').textContent = file.name;
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = document.getElementById('preview-img');
+      img.src = e.target.result;
+      img.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  }
+
+  document.getElementById('pay-form').onsubmit = async (e) => {
+    e.preventDefault();
+    const err = document.getElementById('error');
+    const suc = document.getElementById('success');
+    const btn = document.getElementById('pay-btn');
+    err.style.display = 'none';
+    suc.style.display = 'none';
+
+    const pkgVal = document.getElementById('sel-package').value;
+    if (!pkgVal) { err.textContent = 'Please select a package.'; err.style.display = 'block'; return; }
+
+    const fileInput = document.getElementById('screenshot');
+    if (!fileInput.files[0]) { err.textContent = 'Please upload your payment screenshot.'; err.style.display = 'block'; return; }
+
+    const [pkgName, usd, coins] = pkgVal.split('|');
+
+    // Convert image to base64
+    const toBase64 = f => new Promise((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => resolve(r.result);
+      r.onerror = reject;
+      r.readAsDataURL(f);
+    });
+
+    btn.disabled = true;
+    btn.textContent = '⏳ Submitting...';
+
+    try {
+      const screenshot = await toBase64(fileInput.files[0]);
+      const res = await fetch('/api/payments/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+        body: JSON.stringify({ package: pkgName, amount_usd: parseFloat(usd), coins: parseInt(coins), screenshot, note: document.getElementById('note').value.trim() })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      suc.textContent = '✅ Payment proof submitted! Admin will review and credit your coins shortly.';
+      suc.style.display = 'block';
+      document.getElementById('pay-form').reset();
+      document.getElementById('preview-img').style.display = 'none';
+      document.getElementById('file-name').textContent = '';
+      document.querySelectorAll('.price-card').forEach(c => c.classList.remove('selected'));
+      selectedPackage = null;
+      loadPaymentRequests();
+    } catch (e) {
+      err.textContent = e.message;
+      err.style.display = 'block';
+    }
+
+    btn.disabled = false;
+    btn.textContent = '📤 Submit Payment Proof';
+  };
+
+  function statusBadge(s) {
+    if (s === 'pending')  return '<span class="badge badge-pending">⏳ Pending</span>';
+    if (s === 'approved') return '<span class="badge badge-approved">✅ Approved</span>';
+    if (s === 'rejected') return '<span class="badge badge-rejected">❌ Rejected</span>';
+    return s;
+  }
+
+  async function loadPaymentRequests() {
+    const res = await fetch('/api/payments/mine', { headers: { Authorization: 'Bearer ' + token } });
+    const prs = await res.json();
+    const list = document.getElementById('pr-list');
+    if (!prs.length) { list.innerHTML = '<div class="empty">No payment requests yet.</div>'; return; }
+    list.innerHTML = prs.map(p => `
+      <div class="pr-row">
+        <div>
+          <div style="font-size:14px;font-weight:600">${p.package} — $${p.amount_usd} = 🪙 ${p.coins} coins</div>
+          <div style="font-size:12px;color:#9ca3af;margin-top:2px">${new Date(p.created_at).toLocaleString()}</div>
+        </div>
+        <div>${statusBadge(p.status)}</div>
+      </div>
+    `).join('');
+  }
+
+  async function load() {
+    const [meRes, txRes] = await Promise.all([
+      fetch('/api/user/me',           { headers: { Authorization: 'Bearer ' + token } }),
+      fetch('/api/user/transactions', { headers: { Authorization: 'Bearer ' + token } })
+    ]);
+    if (meRes.status === 401) { logout(); return; }
+    const me = await meRes.json();
+    const txs = await txRes.json();
+
+    document.getElementById('nav-name').textContent = me.username;
+    document.getElementById('balance').textContent  = me.coins;
+
+    const txList = document.getElementById('tx-list');
+    txList.innerHTML = txs.length ? txs.map(t => `
+      <div class="tx-row">
+        <div><div class="tx-desc">${t.description || t.type}</div><div class="tx-date">${new Date(t.created_at).toLocaleString()}</div></div>
+        <div class="tx-amount ${t.amount > 0 ? 'tx-positive' : 'tx-negative'}">${t.amount > 0 ? '+' : ''}${t.amount} coins</div>
+      </div>
+    `).join('') : '<div class="empty">No transactions yet.</div>';
+  }
+
+  load();
+  loadPaymentRequests();
+</script>
+</body>
+</html>

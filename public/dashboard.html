@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard - Mark Sumo Bot</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f3f4f6;color:#111}
+nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px;height:60px;background:#fff;border-bottom:1px solid #e5e7eb;position:sticky;top:0;z-index:10}
+.nav-logo span{background:linear-gradient(135deg,#f97316,#facc15);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:800;font-size:18px}
+.nav-links{display:flex;align-items:center;gap:2px}
+.nav-links a{padding:7px 14px;border-radius:8px;text-decoration:none;color:#6b7280;font-size:14px;font-weight:500;transition:.2s}
+.nav-links a:hover,.nav-links a.active{background:#fff7ed;color:#f97316}
+.nav-user{display:flex;align-items:center;gap:10px}
+.nav-user span{font-size:14px;font-weight:600;color:#111}
+.logout-btn{background:none;border:1.5px solid #e5e7eb;color:#6b7280;padding:6px 14px;border-radius:8px;font-size:13px;cursor:pointer;transition:.2s}
+.logout-btn:hover{border-color:#f97316;color:#f97316}
+main{max-width:960px;margin:0 auto;padding:32px 24px}
+.page-title{font-size:26px;font-weight:800;margin-bottom:4px}
+.page-sub{font-size:14px;color:#6b7280;margin-bottom:28px}
+.page-sub a{color:#f97316;text-decoration:none;font-weight:600}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.stat{background:#fff;border-radius:12px;padding:20px;border:1px solid #e5e7eb;display:flex;align-items:center;justify-content:space-between}
+.stat-left .val{font-size:28px;font-weight:800}
+.stat-left .lbl{font-size:13px;color:#6b7280;margin-top:2px}
+.stat-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.card{background:#fff;border-radius:12px;padding:24px;border:1px solid #e5e7eb;margin-bottom:20px}
+.card-title{font-size:16px;font-weight:700;margin-bottom:4px}
+.card-sub{font-size:13px;color:#6b7280;margin-bottom:16px}
+.progress-bar{background:#f3f4f6;border-radius:99px;height:10px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(135deg,#f97316,#facc15);border-radius:99px;transition:.4s}
+.progress-labels{display:flex;justify-content:space-between;font-size:12px;color:#6b7280;margin-top:6px}
+.cost-row{display:flex;justify-content:space-between;align-items:center}
+.cost-val{font-size:18px;font-weight:700;color:#f97316}
+.cost-note{font-size:13px;color:#6b7280}
+.empty{text-align:center;padding:40px;color:#9ca3af;font-size:14px}
+@media(max-width:600px){.stats{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-logo"><a href="/" style="text-decoration:none"><span>Mark Sumo Bot</span></a></div>
+  <div class="nav-links">
+    <a href="/dashboard" class="active">🏠 Home</a>
+    <a href="/bots">🤖 My Bots</a>
+    <a href="/coins">🪙 My Coins</a>
+    <a href="/deploy">➕ Deploy</a>
+  </div>
+  <div class="nav-user">
+    <span id="nav-name">...</span>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </div>
+</nav>
+
+<main>
+  <div class="page-title">Dashboard</div>
+  <div class="page-sub" id="welcome">Loading...</div>
+
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-left"><div class="val" id="s-total">-</div><div class="lbl">Total Bots</div></div>
+      <div class="stat-icon" style="background:#eff6ff">🤖</div>
+    </div>
+    <div class="stat">
+      <div class="stat-left"><div class="val" id="s-active" style="color:#16a34a">-</div><div class="lbl">Active Bots</div></div>
+      <div class="stat-icon" style="background:#f0fdf4">▶️</div>
+    </div>
+    <div class="stat">
+      <div class="stat-left"><div class="val" id="s-inactive" style="color:#d97706">-</div><div class="lbl">Inactive Bots</div></div>
+      <div class="stat-icon" style="background:#fffbeb">⏸️</div>
+    </div>
+    <div class="stat">
+      <div class="stat-left"><div class="val" id="s-coins" style="color:#f97316">-</div><div class="lbl">Available Coins</div></div>
+      <div class="stat-icon" style="background:#fff7ed">🪙</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Bot Deployment Usage</div>
+    <div class="card-sub" id="usage-sub">Loading...</div>
+    <div class="progress-bar"><div class="progress-fill" id="progress" style="width:0%"></div></div>
+    <div class="progress-labels"><span id="p-left">0 deployed</span><span id="p-right">50 remaining</span></div>
+  </div>
+
+  <div class="card">
+    <div class="cost-row">
+      <div>
+        <div class="card-title">📈 Maintenance Costs</div>
+        <div class="card-sub" style="margin:0">Estimated renewal costs for your active bots</div>
+      </div>
+      <div style="text-align:right">
+        <div class="cost-val" id="daily-cost">- coins/day</div>
+        <div class="cost-note" id="monthly-cost">- coins/month</div>
+      </div>
+    </div>
+    <div style="margin-top:12px;font-size:13px;color:#9ca3af" id="coin-warn"></div>
+  </div>
+</main>
+
+<script>
+  const token = localStorage.getItem('msb_token');
+  const user  = JSON.parse(localStorage.getItem('msb_user') || 'null');
+  if (!token) { window.location.href = '/login'; }
+
+  function logout() {
+    localStorage.removeItem('msb_token');
+    localStorage.removeItem('msb_user');
+    window.location.href = '/login';
+  }
+
+  async function load() {
+    try {
+      const res = await fetch('/api/user/me', { headers: { Authorization: 'Bearer ' + token } });
+      if (res.status === 401) { logout(); return; }
+      const d = await res.json();
+
+      document.getElementById('nav-name').textContent = d.username;
+      document.getElementById('welcome').innerHTML = `Welcome back, <a href="#">${d.username}</a>! Here's your bot overview.`;
+      document.getElementById('s-total').textContent   = d.totalBots;
+      document.getElementById('s-active').textContent  = d.activeBots;
+      document.getElementById('s-inactive').textContent = d.inactiveBots;
+      document.getElementById('s-coins').textContent   = d.coins;
+
+      const MAX = 50;
+      const pct = Math.min((d.totalBots / MAX) * 100, 100);
+      document.getElementById('usage-sub').textContent = `You've deployed ${d.totalBots} of ${MAX} available bot slots`;
+      document.getElementById('progress').style.width = pct + '%';
+      document.getElementById('p-left').textContent  = `${d.totalBots} deployed`;
+      document.getElementById('p-right').textContent = `${MAX - d.totalBots} remaining`;
+
+      const daily = d.activeBots;
+      document.getElementById('daily-cost').textContent  = `${daily} coin${daily !== 1 ? 's' : ''}/day`;
+      document.getElementById('monthly-cost').textContent = `${daily * 30} coins/month`;
+
+      if (d.coins < daily * 3 && daily > 0) {
+        document.getElementById('coin-warn').textContent = '⚠️ Make sure you have enough coins to keep your bots running.';
+        document.getElementById('coin-warn').style.color = '#d97706';
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  load();
+</script>
+</body>
+</html>

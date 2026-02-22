@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin - Mark Sumo Bot</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f3f4f6;color:#111}
+nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px;height:60px;background:#fff;border-bottom:1px solid #e5e7eb}
+.nav-logo span{background:linear-gradient(135deg,#f97316,#facc15);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:800;font-size:18px}
+.badge-admin{background:#fef2f2;color:#dc2626;font-size:12px;font-weight:700;padding:2px 10px;border-radius:20px}
+main{max-width:1100px;margin:0 auto;padding:32px 24px}
+/* Login screen */
+#login-screen{max-width:380px;margin:80px auto}
+.auth-card{background:#fff;border-radius:16px;padding:36px;border:1px solid #e5e7eb;box-shadow:0 4px 24px rgba(0,0,0,.07)}
+.auth-icon{width:52px;height:52px;background:#fff7ed;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 16px}
+.auth-card h2{text-align:center;font-size:20px;font-weight:700;margin-bottom:4px}
+.auth-card p{text-align:center;font-size:13px;color:#6b7280;margin-bottom:24px}
+input{width:100%;padding:11px 14px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:14px;outline:none;transition:.2s;margin-bottom:12px}
+input:focus{border-color:#f97316}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:11px 20px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;border:none;transition:.2s;text-decoration:none}
+.btn-primary{background:linear-gradient(135deg,#f97316,#ea580c);color:#fff;width:100%}
+.btn-primary:hover{opacity:.9}
+.btn-sm{padding:6px 14px;font-size:13px}
+.btn-danger{background:#fef2f2;color:#dc2626;border:1px solid #fecaca}
+.btn-danger:hover{background:#fee2e2}
+.btn-green{background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0}
+/* Dashboard */
+#dashboard{display:none}
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.page-title{font-size:22px;font-weight:800}
+.tabs{display:flex;gap:4px;background:#fff;border-radius:10px;padding:4px;border:1px solid #e5e7eb;margin-bottom:24px}
+.tab{flex:1;padding:9px;border-radius:8px;text-align:center;font-size:14px;font-weight:600;cursor:pointer;color:#6b7280;transition:.2s;border:none;background:none}
+.tab.active{background:linear-gradient(135deg,#f97316,#ea580c);color:#fff}
+.tab-content{display:none}
+.tab-content.active{display:block}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.stat{background:#fff;border-radius:12px;padding:20px;border:1px solid #e5e7eb;display:flex;align-items:center;justify-content:space-between}
+.stat .val{font-size:26px;font-weight:800}
+.stat .lbl{font-size:12px;color:#6b7280;margin-top:2px}
+.stat-icon{font-size:22px}
+.card{background:#fff;border-radius:12px;border:1px solid #e5e7eb;margin-bottom:20px}
+.card-head{padding:18px 20px;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;justify-content:space-between}
+.card-head h3{font-size:15px;font-weight:700}
+.card-body{padding:20px}
+.form-row{display:flex;gap:10px;flex-wrap:wrap}
+.form-row input{flex:1;min-width:140px;margin-bottom:0}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;padding:10px 12px;font-size:12px;font-weight:600;color:#6b7280;border-bottom:1px solid #f0f0f0;text-transform:uppercase;letter-spacing:.5px}
+td{padding:12px;font-size:13px;border-bottom:1px solid #f9fafb;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600}
+.badge-active{background:#dcfce7;color:#16a34a}
+.badge-stopped{background:#f3f4f6;color:#6b7280}
+.error{background:#fef2f2;border:1px solid #fecaca;color:#dc2626;border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:12px;display:none}
+.topup-form{display:inline-flex;align-items:center;gap:6px}
+.topup-form input{width:70px;padding:5px 8px;margin:0;font-size:13px}
+.badge-pending{background:#fef9c3;color:#854d0e}
+.badge-approved{background:#dcfce7;color:#16a34a}
+.badge-rejected{background:#fef2f2;color:#dc2626}
+.btn-approve{background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0}
+.btn-approve:hover{background:#dcfce7}
+.btn-reject{background:#fef2f2;color:#dc2626;border:1px solid #fecaca}
+.btn-reject:hover{background:#fee2e2}
+.screenshot-thumb{width:48px;height:48px;object-fit:cover;border-radius:6px;cursor:pointer;border:1px solid #e5e7eb}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal-img{max-width:90vw;max-height:90vh;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.modal-close{position:fixed;top:20px;right:24px;background:#fff;border:none;border-radius:50%;width:36px;height:36px;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.pay-actions{display:flex;gap:6px}
+@media(max-width:700px){.stats{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-logo"><a href="/" style="text-decoration:none"><span>Mark Sumo Bot</span></a></div>
+  <div><span class="badge-admin">⚙️ Admin Panel</span></div>
+</nav>
+
+<!-- Login Screen -->
+<div id="login-screen">
+  <div class="auth-card">
+    <div class="auth-icon">⚙️</div>
+    <h2>Admin Login</h2>
+    <p>Sign in to the Mark Sumo Bot admin panel</p>
+    <div class="error" id="auth-error"></div>
+    <input type="password" id="admin-pass" placeholder="Enter admin password">
+    <button class="btn btn-primary" onclick="adminLogin()">Sign In</button>
+  </div>
+</div>
+
+<!-- Admin Dashboard -->
+<div id="dashboard">
+  <main>
+    <div class="page-header">
+      <div class="page-title">⚙️ Admin Dashboard</div>
+      <button class="btn btn-sm" style="border:1.5px solid #e5e7eb;background:#fff" onclick="adminLogout()">Logout</button>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" onclick="showTab('overview')">📊 Overview</button>
+      <button class="tab" onclick="showTab('users')">👥 Users</button>
+      <button class="tab" onclick="showTab('bots')">🤖 Bots</button>
+      <button class="tab" onclick="showTab('payments')">💳 Payments <span id="pay-badge" style="display:none;background:#dc2626;color:#fff;border-radius:20px;padding:1px 7px;font-size:11px;margin-left:4px"></span></button>
+    </div>
+
+    <!-- Overview Tab -->
+    <div class="tab-content active" id="tab-overview">
+      <div class="stats">
+        <div class="stat"><div><div class="val" id="st-users">-</div><div class="lbl">Total Users</div></div><div class="stat-icon">👥</div></div>
+        <div class="stat"><div><div class="val" id="st-active" style="color:#16a34a">-</div><div class="lbl">Active Bots</div></div><div class="stat-icon">▶️</div></div>
+        <div class="stat"><div><div class="val" id="st-deployments">-</div><div class="lbl">Total Deployments</div></div><div class="stat-icon">🚀</div></div>
+        <div class="stat"><div><div class="val" id="st-coins" style="color:#f97316">-</div><div class="lbl">Total Coins</div></div><div class="stat-icon">🪙</div></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3>Recent Users</h3></div>
+        <div class="card-body" style="padding:0">
+          <table>
+            <thead><tr><th>Username</th><th>Email</th><th>Coins</th><th>Active Bots</th><th>Joined</th></tr></thead>
+            <tbody id="recent-users"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Users Tab -->
+    <div class="tab-content" id="tab-users">
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-head"><h3>Top Up Coins</h3></div>
+        <div class="card-body">
+          <div class="error" id="topup-error"></div>
+          <div class="form-row">
+            <input type="text" id="topup-username" placeholder="Username">
+            <input type="number" id="topup-amount" placeholder="Coins" min="1">
+            <button class="btn btn-green btn-sm" onclick="topUp()">Add Coins</button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3>All Users</h3></div>
+        <div class="card-body" style="padding:0">
+          <table>
+            <thead><tr><th>Username</th><th>Email</th><th>Name</th><th>Coins</th><th>Active Bots</th><th>Quick Top Up</th></tr></thead>
+            <tbody id="users-table"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bots Tab -->
+    <div class="tab-content" id="tab-bots">
+      <div class="card">
+        <div class="card-head"><h3>All Deployments</h3></div>
+        <div class="card-body" style="padding:0">
+          <table>
+            <thead><tr><th>Bot ID</th><th>User</th><th>Status</th><th>Deployed</th><th>Action</th></tr></thead>
+            <tbody id="bots-table"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payments Tab -->
+    <div class="tab-content" id="tab-payments">
+      <div class="card">
+        <div class="card-head">
+          <h3>Payment Requests</h3>
+          <button class="btn btn-sm" style="border:1.5px solid #e5e7eb;background:#fff" onclick="loadPayments()">↻ Refresh</button>
+        </div>
+        <div class="card-body" style="padding:0">
+          <table>
+            <thead><tr><th>User</th><th>Package</th><th>Amount</th><th>Coins</th><th>Proof</th><th>Note</th><th>Date</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody id="payments-table"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Screenshot Modal -->
+<div class="modal-overlay" id="img-modal" onclick="closeModal()">
+  <button class="modal-close" onclick="closeModal()">✕</button>
+  <img class="modal-img" id="modal-img-el" src="" alt="Payment proof">
+</div>
+
+<script>
+  let adminKey = '';
+
+  async function adminLogin() {
+    const pw = document.getElementById('admin-pass').value;
+    const err = document.getElementById('auth-error');
+    err.style.display = 'none';
+    try {
+      const res = await fetch('/api/admin/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: pw })
+      });
+      if (!res.ok) throw new Error('Invalid password');
+      adminKey = pw;
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('dashboard').style.display = 'block';
+      loadAll();
+    } catch (e) {
+      err.textContent = e.message;
+      err.style.display = 'block';
+    }
+  }
+
+  function adminLogout() { adminKey = ''; location.reload(); }
+
+  function showTab(id) {
+    document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', ['overview','users','bots','payments'][i] === id));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === 'tab-' + id));
+    if (id === 'payments') loadPayments();
+  }
+
+  function hdr() { return { 'Content-Type': 'application/json', 'x-admin-key': adminKey }; }
+
+  async function loadPayments() {
+    const res = await fetch('/api/admin/payment-requests', { headers: hdr() });
+    const payments = await res.json();
+
+    const pending = payments.filter(p => p.status === 'pending').length;
+    const badge = document.getElementById('pay-badge');
+    if (pending > 0) { badge.textContent = pending; badge.style.display = 'inline'; }
+    else { badge.style.display = 'none'; }
+
+    document.getElementById('payments-table').innerHTML = payments.length === 0
+      ? '<tr><td colspan="9" style="text-align:center;color:#9ca3af;padding:24px">No payment requests yet.</td></tr>'
+      : payments.map(p => `
+      <tr>
+        <td><strong>${p.username}</strong></td>
+        <td>${p.package}</td>
+        <td style="color:#16a34a;font-weight:700">$${p.amount_usd}</td>
+        <td>🪙 ${p.coins}</td>
+        <td>
+          ${p.screenshot
+            ? `<img class="screenshot-thumb" src="${p.screenshot}" onclick="viewScreenshot('${p.id}')" title="Click to view">`
+            : '<span style="color:#9ca3af;font-size:12px">None</span>'}
+        </td>
+        <td style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#6b7280">${p.note || '—'}</td>
+        <td style="color:#9ca3af;white-space:nowrap">${new Date(p.created_at).toLocaleDateString()}</td>
+        <td><span class="badge badge-${p.status}">${p.status}</span></td>
+        <td>
+          ${p.status === 'pending' ? `
+          <div class="pay-actions">
+            <button class="btn btn-approve btn-sm" onclick="approvePayment(${p.id}, '${p.username}', ${p.coins})">✓ Approve</button>
+            <button class="btn btn-reject btn-sm" onclick="rejectPayment(${p.id})">✕</button>
+          </div>` : '—'}
+        </td>
+      </tr>
+    `).join('');
+
+    // store screenshot map for modal
+    window._payScreenshots = {};
+    payments.forEach(p => { if (p.screenshot) window._payScreenshots[p.id] = p.screenshot; });
+  }
+
+  function viewScreenshot(id) {
+    const src = window._payScreenshots && window._payScreenshots[id];
+    if (!src) return;
+    document.getElementById('modal-img-el').src = src;
+    document.getElementById('img-modal').classList.add('open');
+  }
+
+  function closeModal() {
+    document.getElementById('img-modal').classList.remove('open');
+    document.getElementById('modal-img-el').src = '';
+  }
+
+  async function approvePayment(id, username, coins) {
+    if (!confirm(`Approve this request and credit ${coins} coins to ${username}?`)) return;
+    const res = await fetch(`/api/admin/payment-requests/${id}/approve`, { method: 'POST', headers: hdr() });
+    const d = await res.json();
+    if (!res.ok) return alert(d.error || 'Failed to approve.');
+    alert(`✅ Approved! ${coins} coins credited to ${username}.`);
+    loadPayments();
+    loadAll();
+  }
+
+  async function rejectPayment(id) {
+    if (!confirm('Reject this payment request?')) return;
+    const res = await fetch(`/api/admin/payment-requests/${id}/reject`, { method: 'POST', headers: hdr() });
+    if (!res.ok) return alert('Failed to reject.');
+    alert('❌ Payment request rejected.');
+    loadPayments();
+  }
+
+  async function loadAll() {
+    const [statsRes, usersRes, botsRes] = await Promise.all([
+      fetch('/api/admin/stats',       { headers: hdr() }),
+      fetch('/api/admin/users',       { headers: hdr() }),
+      fetch('/api/admin/deployments', { headers: hdr() })
+    ]);
+    const stats = await statsRes.json();
+    const users = await usersRes.json();
+    const bots  = await botsRes.json();
+
+    // Stats
+    document.getElementById('st-users').textContent       = stats.totalUsers;
+    document.getElementById('st-active').textContent      = stats.activeBots;
+    document.getElementById('st-deployments').textContent = stats.totalDeployments;
+    document.getElementById('st-coins').textContent       = stats.totalCoins;
+
+    // Recent users
+    document.getElementById('recent-users').innerHTML = (stats.recentUsers || []).map(u => `
+      <tr>
+        <td><strong>${u.username}</strong></td>
+        <td>${u.email}</td>
+        <td>🪙 ${u.coins}</td>
+        <td>${u.active_bots}</td>
+        <td style="color:#9ca3af">${new Date(u.created_at).toLocaleDateString()}</td>
+      </tr>
+    `).join('');
+
+    // Users table
+    document.getElementById('users-table').innerHTML = users.map(u => `
+      <tr>
+        <td><strong>${u.username}</strong></td>
+        <td>${u.email}</td>
+        <td>${u.name}</td>
+        <td>🪙 <strong>${u.coins}</strong></td>
+        <td>${u.active_bots}</td>
+        <td>
+          <div class="topup-form">
+            <input type="number" id="qi-${u.username}" placeholder="Coins" min="1">
+            <button class="btn btn-green btn-sm" onclick="quickTopUp('${u.username}')">Add</button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+
+    // Update payments badge
+    loadPayments();
+
+    // Bots table
+    document.getElementById('bots-table').innerHTML = bots.map(b => `
+      <tr>
+        <td style="font-size:12px;color:#6b7280">${b.app_name || b.bot_id}</td>
+        <td>${b.username}</td>
+        <td><span class="badge ${b.status === 'running' ? 'badge-active' : 'badge-stopped'}">${b.status}</span></td>
+        <td style="color:#9ca3af">${new Date(b.deployed_at).toLocaleDateString()}</td>
+        <td>
+          ${b.status === 'running'
+            ? `<button class="btn btn-danger btn-sm" onclick="stopBot('${b.bot_id}')">■ Stop</button>`
+            : '—'}
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  async function topUp() {
+    const username = document.getElementById('topup-username').value.trim();
+    const amount   = parseInt(document.getElementById('topup-amount').value);
+    const err = document.getElementById('topup-error');
+    err.style.display = 'none';
+    if (!username || !amount) { err.textContent = 'Username and amount required.'; err.style.display = 'block'; return; }
+    try {
+      const res = await fetch('/api/admin/topup', {
+        method: 'POST',
+        headers: hdr(),
+        body: JSON.stringify({ username, amount })
+      });
+      const d = await res.json();
+      if (!res.ok) throw new Error(d.error);
+      alert(`✅ Added ${amount} coins to ${username}. New balance: ${d.newCoins}`);
+      document.getElementById('topup-username').value = '';
+      document.getElementById('topup-amount').value   = '';
+      loadAll();
+    } catch (e) {
+      err.textContent = e.message;
+      err.style.display = 'block';
+    }
+  }
+
+  async function quickTopUp(username) {
+    const amount = parseInt(document.getElementById('qi-' + username).value);
+    if (!amount || amount <= 0) return alert('Enter a valid amount');
+    const res = await fetch('/api/admin/topup', {
+      method: 'POST', headers: hdr(),
+      body: JSON.stringify({ username, amount })
+    });
+    const d = await res.json();
+    if (!res.ok) return alert(d.error);
+    alert(`✅ Added ${amount} coins to ${username}. New balance: ${d.newCoins}`);
+    loadAll();
+  }
+
+  async function stopBot(botId) {
+    if (!confirm('Stop this bot?')) return;
+    await fetch('/api/admin/deployments/' + botId, { method: 'DELETE', headers: hdr() });
+    loadAll();
+  }
+
+  // Auto-refresh every 60s
+  setInterval(() => { if (adminKey) loadAll(); }, 60000);
+
+  document.getElementById('admin-pass').addEventListener('keydown', e => {
+    if (e.key === 'Enter') adminLogin();
+  });
+</script>
+</body>
+</html>
