@@ -48,10 +48,11 @@ textarea{min-height:100px;resize:vertical}
 .btn-primary:disabled{opacity:.5;cursor:not-allowed}
 .error{background:#fef2f2;border:1px solid #fecaca;color:#dc2626;border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:16px;display:none}
 .success{background:#f0fdf4;border:1px solid #bbf7d0;color:#16a34a;border-radius:8px;padding:14px;font-size:14px;margin-bottom:16px;display:none}
-@media(max-width:640px){.nav-links{display:none}.nav-user span{display:none}.logout-btn{padding:6px 10px;font-size:12px}main{padding:16px 12px;padding-bottom:80px}.bottom-nav{display:flex}}
+.nav-links{display:flex;align-items:center;gap:2px}
 .bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e5e7eb;padding:6px 0 10px;z-index:100;justify-content:space-around}
 .bottom-nav a{display:flex;flex-direction:column;align-items:center;gap:2px;text-decoration:none;color:#6b7280;font-size:10px;font-weight:600;padding:4px 12px;border-radius:8px}
 .bottom-nav a.active{color:#f97316}
+@media(max-width:640px){.nav-links{display:none!important}.nav-user span{display:none}.logout-btn{padding:6px 10px;font-size:12px}main{padding:16px 12px;padding-bottom:80px}.bottom-nav{display:flex!important}}
 </style>
 </head>
 <body>
@@ -158,7 +159,7 @@ textarea{min-height:100px;resize:vertical}
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
-      suc.innerHTML = `✅ Bot deployed successfully! <strong>${data.coinsRemaining}</strong> coins remaining. <a href="/bots">View your bots →</a>`;
+      suc.innerHTML = `✅ Bot deployed successfully! Your bot will be active on WhatsApp within <strong>1 minute</strong>. <strong>${data.coinsRemaining}</strong> coins remaining. <a href="/bots">View your bots →</a>`;
       suc.style.display = 'block';
       document.getElementById('form').reset();
       loadBalance();

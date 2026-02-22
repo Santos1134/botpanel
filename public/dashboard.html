@@ -35,10 +35,10 @@ main{max-width:960px;margin:0 auto;padding:32px 24px}
 .cost-val{font-size:18px;font-weight:700;color:#f97316}
 .cost-note{font-size:13px;color:#6b7280}
 .empty{text-align:center;padding:40px;color:#9ca3af;font-size:14px}
-@media(max-width:640px){.stats{grid-template-columns:repeat(2,1fr)}.nav-links{display:none}.nav-user span{display:none}.logout-btn{padding:6px 10px;font-size:12px}main{padding:16px 12px;padding-bottom:80px}.bottom-nav{display:flex}}
 .bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e5e7eb;padding:6px 0 10px;z-index:100;justify-content:space-around}
 .bottom-nav a{display:flex;flex-direction:column;align-items:center;gap:2px;text-decoration:none;color:#6b7280;font-size:10px;font-weight:600;padding:4px 12px;border-radius:8px}
 .bottom-nav a.active{color:#f97316}
+@media(max-width:640px){.stats{grid-template-columns:repeat(2,1fr)}.nav-links{display:none!important}.nav-user span{display:none}.logout-btn{padding:6px 10px;font-size:12px}main{padding:16px 12px;padding-bottom:80px}.bottom-nav{display:flex!important}}
 </style>
 </head>
 <body>
@@ -99,6 +99,14 @@ main{max-width:960px;margin:0 auto;padding:32px 24px}
     </div>
     <div style="margin-top:12px;font-size:13px;color:#9ca3af" id="coin-warn"></div>
   </div>
+
+  <a href="/coins" style="display:flex;align-items:center;justify-content:space-between;background:linear-gradient(135deg,#f97316,#ea580c);color:#fff;border-radius:12px;padding:18px 24px;text-decoration:none;margin-bottom:20px">
+    <div>
+      <div style="font-size:16px;font-weight:800">🪙 Buy Coins</div>
+      <div style="font-size:13px;opacity:.85;margin-top:2px">Top up to keep your bots running 24/7</div>
+    </div>
+    <div style="font-size:24px">→</div>
+  </a>
 </main>
 
 <script>
