@@ -38,8 +38,8 @@ main{max-width:960px;margin:0 auto;padding:32px 24px}
 .bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e5e7eb;padding:6px 0 10px;z-index:100;justify-content:space-around}
 .bottom-nav a{display:flex;flex-direction:column;align-items:center;gap:2px;text-decoration:none;color:#6b7280;font-size:10px;font-weight:600;padding:4px 12px;border-radius:8px}
 .bottom-nav a.active{color:#f97316}
-.mobile-coins-bar{display:none}
-@media(max-width:640px){.stats{grid-template-columns:repeat(2,1fr)}.nav-links{display:none!important}.nav-user span{display:none}.logout-btn{padding:6px 10px;font-size:12px}main{padding:16px 12px;padding-bottom:80px}.bottom-nav{display:flex!important}.mobile-coins-bar{display:flex!important;align-items:center;justify-content:space-between;background:linear-gradient(135deg,#f97316,#ea580c);border-radius:12px;padding:13px 16px;margin-bottom:16px;text-decoration:none;color:#fff}}
+.mobile-coins-bar{display:none}.mob-nav{display:none}
+@media(max-width:640px){.stats{grid-template-columns:repeat(2,1fr)}.nav-links{display:none!important}.nav-user span{display:none}.logout-btn{padding:6px 10px;font-size:12px}main{padding:16px 12px;padding-bottom:80px}.bottom-nav{display:flex!important}.mobile-coins-bar{display:flex!important;align-items:center;justify-content:space-between;background:linear-gradient(135deg,#f97316,#ea580c);border-radius:12px;padding:13px 16px;margin-bottom:12px;text-decoration:none;color:#fff}.mob-nav{display:grid!important;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}.mob-nav a{display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 4px;background:#fff;border-radius:10px;border:1px solid #e5e7eb;text-decoration:none;color:#6b7280;font-size:10px;font-weight:600}.mob-nav a.active{background:#fff7ed;color:#f97316;border-color:#fed7aa}.mob-nav a span:first-child{font-size:20px}}
 </style>
 </head>
 <body>
@@ -58,6 +58,12 @@ main{max-width:960px;margin:0 auto;padding:32px 24px}
 </nav>
 
 <main>
+  <div class="mob-nav">
+    <a href="/dashboard" class="active"><span>🏠</span><span>Home</span></a>
+    <a href="/bots"><span>🤖</span><span>Bots</span></a>
+    <a href="/coins"><span>🪙</span><span>Coins</span></a>
+    <a href="/deploy"><span>➕</span><span>Deploy</span></a>
+  </div>
   <a href="/coins" class="mobile-coins-bar"><div><div style="font-size:14px;font-weight:800">🪙 Buy Coins</div><div style="font-size:12px;opacity:.85">Top up to keep your bots running</div></div><div style="font-size:20px">→</div></a>
   <div class="page-title">Dashboard</div>
   <div class="page-sub" id="welcome">Loading...</div>
