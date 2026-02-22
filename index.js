@@ -165,6 +165,16 @@ app.get('/api/admin/deployments', async (req, res) => {
   }
 });
 
+app.delete('/api/admin/users/:username', async (req, res) => {
+  try {
+    const { data } = await vps('delete', `/admin/users/${req.params.username}`, null, req.headers['x-admin-key']);
+    res.json(data);
+  } catch (e) {
+    const msg = e.response?.data?.error || 'Failed to delete user.';
+    res.status(e.response?.status || 500).json({ error: msg });
+  }
+});
+
 app.delete('/api/admin/deployments/:botId', async (req, res) => {
   try {
     const { data } = await vps('delete', `/admin/deployments/${req.params.botId}`, null, req.headers['x-admin-key']);

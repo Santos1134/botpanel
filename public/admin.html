@@ -141,7 +141,7 @@ tr:last-child td{border-bottom:none}
         <div class="card-head"><h3>All Users</h3></div>
         <div class="card-body" style="padding:0">
           <table>
-            <thead><tr><th>Username</th><th>Email</th><th>Name</th><th>Coins</th><th>Active Bots</th><th>Quick Top Up</th></tr></thead>
+            <thead><tr><th>Username</th><th>Email</th><th>Name</th><th>Coins</th><th>Active Bots</th><th>Quick Top Up</th><th>Action</th></tr></thead>
             <tbody id="users-table"></tbody>
           </table>
         </div>
@@ -330,6 +330,7 @@ tr:last-child td{border-bottom:none}
             <button class="btn btn-green btn-sm" onclick="quickTopUp('${u.username}')">Add</button>
           </div>
         </td>
+        <td><button class="btn btn-danger btn-sm" onclick="deleteUser('${u.username}')">🗑 Delete</button></td>
       </tr>
     `).join('');
 
@@ -386,6 +387,15 @@ tr:last-child td{border-bottom:none}
     const d = await res.json();
     if (!res.ok) return alert(d.error);
     alert(`✅ Added ${amount} coins to ${username}. New balance: ${d.newCoins}`);
+    loadAll();
+  }
+
+  async function deleteUser(username) {
+    if (!confirm(`Delete user "${username}"? This will stop their bots and remove all their data permanently.`)) return;
+    const res = await fetch('/api/admin/users/' + username, { method: 'DELETE', headers: hdr() });
+    const d = await res.json();
+    if (!res.ok) return alert(d.error || 'Failed to delete user.');
+    alert(`✅ User "${username}" deleted.`);
     loadAll();
   }
 
