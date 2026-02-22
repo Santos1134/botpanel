@@ -233,6 +233,7 @@ app.post('/deploy', requireApiKey, (req, res) => {
     fs.writeFileSync(path.join(botDir, '.env'), envContent);
 
     // Write PM2 ecosystem config — env vars passed directly, no dotenv needed
+    const botPort = Math.floor(Math.random() * 40000) + 10000;
     const ecoConfig = {
       apps: [{
         name,
@@ -244,7 +245,8 @@ app.post('/deploy', requireApiKey, (req, res) => {
           BOT_NAME: 'MARK SUMO BOT',
           PREFIX: '.',
           MODE: 'private',
-          TIME_ZONE: 'Africa/Lagos'
+          TIME_ZONE: 'Africa/Lagos',
+          PORT: String(botPort)
         }
       }]
     };
