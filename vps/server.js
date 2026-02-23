@@ -8,7 +8,7 @@ const cron     = require('node-cron');
 const bcrypt   = require('bcryptjs');
 
 const app = express();
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 
 const API_KEY          = process.env.API_KEY          || 'change-this-secret';
 const ADMIN_PASSWORD   = process.env.ADMIN_PASSWORD   || 'admin123';
