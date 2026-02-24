@@ -187,7 +187,7 @@ input:focus,textarea:focus,select:focus{border-color:#f97316;box-shadow:0 0 0 3p
     <form id="pay-form">
       <div class="form-group">
         <label>Selected Package</label>
-        <select id="sel-package" required>
+        <select id="sel-package">
           <option value="">— Select a package above —</option>
           <option value="Starter|5|30">Starter — $5 = 30 coins</option>
           <option value="Standard|10|70">Standard — $10 = 70 coins</option>
@@ -209,7 +209,7 @@ input:focus,textarea:focus,select:focus{border-color:#f97316;box-shadow:0 0 0 3p
         <label>Transaction Reference / Note <span style="font-size:12px;color:#9ca3af;font-weight:400">(optional)</span></label>
         <input type="text" id="note" placeholder="e.g. transaction ID or any note for admin">
       </div>
-      <button type="submit" class="btn btn-primary" id="pay-btn">📤 Submit Payment Proof</button>
+      <button type="button" class="btn btn-primary" id="pay-btn" onclick="submitPayment()">📤 Submit Payment Proof</button>
     </form>
   </div>
 
@@ -265,8 +265,7 @@ input:focus,textarea:focus,select:focus{border-color:#f97316;box-shadow:0 0 0 3p
     reader.readAsDataURL(file);
   }
 
-  document.getElementById('pay-form').onsubmit = async (e) => {
-    e.preventDefault();
+  async function submitPayment() {
     const err = document.getElementById('error');
     const suc = document.getElementById('success');
     const btn = document.getElementById('pay-btn');
@@ -274,14 +273,22 @@ input:focus,textarea:focus,select:focus{border-color:#f97316;box-shadow:0 0 0 3p
     suc.style.display = 'none';
 
     const pkgVal = document.getElementById('sel-package').value;
-    if (!pkgVal) { err.textContent = 'Please select a package.'; err.style.display = 'block'; return; }
+    if (!pkgVal) {
+      err.textContent = '⚠️ Please select a package first.';
+      err.style.display = 'block';
+      document.getElementById('sel-package').scrollIntoView({ behavior: 'smooth' });
+      return;
+    }
 
     const fileInput = document.getElementById('screenshot');
-    if (!fileInput.files[0]) { err.textContent = 'Please upload your payment screenshot.'; err.style.display = 'block'; return; }
+    if (!fileInput.files[0]) {
+      err.textContent = '⚠️ Please upload your payment screenshot.';
+      err.style.display = 'block';
+      return;
+    }
 
     const [pkgName, usd, coins] = pkgVal.split('|');
 
-    // Convert image to base64
     const toBase64 = f => new Promise((resolve, reject) => {
       const r = new FileReader();
       r.onload = () => resolve(r.result);
@@ -310,13 +317,13 @@ input:focus,textarea:focus,select:focus{border-color:#f97316;box-shadow:0 0 0 3p
       selectedPackage = null;
       loadPaymentRequests();
     } catch (e) {
-      err.textContent = e.message;
+      err.textContent = '❌ ' + (e.message || 'Submission failed. Please try again.');
       err.style.display = 'block';
     }
 
     btn.disabled = false;
     btn.textContent = '📤 Submit Payment Proof';
-  };
+  }
 
   function statusBadge(s) {
     if (s === 'pending')  return '<span class="badge badge-pending">⏳ Pending</span>';
